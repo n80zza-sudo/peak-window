@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Peak Window Reminders</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<meta name="theme-color" content="#12091f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Peak Window">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#121214;--panel:#1b1b1f;--card:#0e0e10;--ink:#f3f3f5;--mute:#9b9ba4;--line:#2b2b31;--shadow:rgba(0,0,0,.5);--s:#e7a3c3;--t:#6fe3b4;--hot:#e7a3c3;--cool:#6fe3b4;--gold:#f0c26a;--on:#1a1020;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root{--bg:#f2f1f4;--panel:#ffffff;--card:#fbfafc;--ink:#1d1b22;--mute:#6c6a76;--line:#dcd9e2;--shadow:rgba(40,30,60,.15);--s:#c25788;--t:#169c70;--hot:#c25788;--cool:#169c70;--gold:#b87a00;--on:#ffffff}}
+*{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Outfit","Helvetica Neue",Arial,sans-serif;font-size:16px;user-select:none;-webkit-user-select:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--cool);outline-offset:2px}
+input{accent-color:var(--s)}
+main{max-width:430px;margin:0 auto;padding:20px 16px 150px}
+h1{font-size:30px;margin:8px 0 16px}
+.sub{color:var(--mute);font-size:15px;margin:0 0 12px}
+.view{display:none}.view.on{display:block;animation:fade .2s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.head b{font-size:24px;font-weight:800}
+.good{color:var(--t);font-weight:600}.warn{color:var(--gold);font-weight:600}
+.avatar{width:46px;height:46px;border-radius:50%;background:var(--panel);border:1px solid var(--line);display:grid;place-items:center}
+.avatar svg{width:26px;height:26px;fill:none;stroke:var(--mute);stroke-width:2;stroke-linecap:round}
+.sect{color:var(--mute);font-weight:600;margin:6px 0 10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px}
+.stat.open{outline:2px solid var(--ink);outline-offset:3px;border-color:transparent}
+.row2{display:flex;justify-content:space-between;align-items:center}
+.ttl{font-size:22px;font-weight:800}
+.stat.s .ttl{color:var(--s)}.stat.t .ttl{color:var(--t)}
+.lvl{color:var(--mute);font-weight:600;margin-top:2px}
+.ring{position:relative;width:72px;height:72px}
+.ring>svg{width:72px;height:72px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8}
+.ring .bg{stroke:var(--line)}
+.ring .fg{stroke-linecap:round;transition:stroke-dashoffset .5s}
+.s .fg{stroke:var(--s)}.t .fg{stroke:var(--t)}
+.gl{position:absolute;inset:0;display:grid;place-items:center}
+.s .gl{color:var(--s)}.t .gl{color:var(--t)}
+.gl svg{width:26px;height:26px}
+.stbar{margin-top:12px;border-radius:14px;padding:12px 14px;font-weight:600}
+.s .stbar.open{background:rgba(231,163,195,.16)}.t .stbar.open{background:rgba(111,227,180,.14)}
+.stbar.rest{background:var(--panel);color:var(--mute)}
+.stl{display:flex;align-items:center;gap:8px}
+.stl span:first-child{flex:1}
+.stl .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.track{height:10px;border-radius:99px;background:var(--line);margin-top:10px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:99px;transition:width .4s}
+.s .track i{background:var(--s)}.t .track i{background:var(--t)}
+.nextc{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:14px 16px;margin:4px 0 14px}
+.nextc small{color:var(--mute);font-weight:600}
+.nextc .t{font-size:34px;font-weight:800;line-height:1.05}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:14px}
+.panel h2{margin:0 0 8px;font-size:18px;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);border-radius:999px;background:transparent;padding:6px 12px;font-weight:600;min-height:44px}
+.chip[aria-pressed="true"]{background:var(--s);color:var(--on);border-color:transparent}
+.btn{border:0;border-radius:999px;background:var(--s);color:var(--on);padding:10px 18px;font-size:17px;font-weight:700;min-height:44px}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:default}
+select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 8px}
+.drills label{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.drills small{color:var(--mute);margin-left:auto}
+.hud{position:fixed;left:12px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));max-width:406px;margin:0 auto;z-index:20}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 30px var(--shadow);padding:14px;animation:slide .35s cubic-bezier(.2,.9,.3,1)}
+@keyframes slide{from{transform:translateX(-120%)}to{transform:none}}
+.card .tag{font-weight:600;color:var(--s)}
+.card .big{font-size:26px;font-weight:800;line-height:1.1}
+.key{display:inline-grid;place-items:center;min-width:28px;height:28px;border:1px solid var(--line);border-radius:8px;padding:0 6px;font-weight:800}
+.hold{position:relative;width:100%;margin-top:10px;border:1px solid var(--line);border-radius:16px;background:transparent;padding:12px;font-weight:600;overflow:hidden;touch-action:none;user-select:none}
+.hold i{position:absolute;inset:0 auto 0 0;width:0;background:var(--t);opacity:.4}
+.hold span{position:relative}
+.bar{height:10px;border-radius:99px;overflow:hidden;background:var(--line)}
+.bar i{display:block;height:100%;width:0;transition:width .4s}
+.count{font-size:72px;font-weight:800;line-height:1;text-align:center;margin:6px 0}
+.count.pulse{animation:pulse .18s}
+@keyframes pulse{50%{transform:scale(1.12);color:var(--s)}}
+.toast{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:12px;z-index:30;border-radius:999px;background:var(--ink);color:var(--bg);padding:8px 16px;font-weight:600;font-size:18px;animation:slide2 2.4s forwards}
+@keyframes slide2{0%{transform:translateX(120%)}12%,80%{transform:none}100%{transform:translateX(120%);opacity:0}}
+.banner{position:fixed;left:0;right:0;top:38%;z-index:30;text-align:center;font-size:40px;font-weight:800;color:var(--gold);text-shadow:2px 2px 0 var(--bg);animation:ban 2s forwards;pointer-events:none}
+@keyframes ban{0%{opacity:0;transform:scale(1.4)}15%,75%{opacity:1;transform:none}100%{opacity:0}}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:25;display:flex;background:var(--panel);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{flex:1;border:0;background:transparent;padding:10px 0 8px;font-weight:600;font-size:12px;color:var(--mute);display:grid;justify-items:center;gap:3px;min-height:56px}
+.tab svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tab[aria-selected="true"]{color:var(--s)}
+@media (prefers-reduced-motion:reduce){.card,.toast,.banner,.count.pulse,.view.on{animation:none}}
+:root{--bg:#12091f;--panel:#1d1230;--card:#150c26;--ink:#fff4fa;--mute:#b19cc9;--line:#35214f;--s:#ff5fa2;--t:#2ee6d6;--hot:#ff5fa2;--cool:#2ee6d6;--gold:#ffb04a;--on:#1a0b26}
+@media (prefers-color-scheme:light){:root{--bg:#fff1ea;--panel:#ffffff;--card:#fff8f4;--ink:#2a1235;--mute:#7a5d8a;--line:#f0d4d0;--s:#d6246e;--t:#0a9b95;--hot:#d6246e;--cool:#0a9b95;--gold:#d9711a;--on:#ffffff}}
+body{background:radial-gradient(120% 55% at 50% -8%,rgba(255,95,162,.32),transparent 62%),radial-gradient(80% 45% at 95% 0,rgba(255,176,74,.22),transparent 60%),var(--bg);background-attachment:fixed}
+body::before{content:"";position:fixed;z-index:-1;top:-70px;right:-50px;width:230px;height:230px;border-radius:50%;background:linear-gradient(180deg,var(--gold),var(--s));opacity:.28;pointer-events:none;-webkit-mask-image:linear-gradient(#000 0 45%,transparent 45% 48%,#000 48% 58%,transparent 58% 62%,#000 62% 70%,transparent 70% 75%,#000 75% 82%,transparent 82% 88%,#000 88%);mask-image:linear-gradient(#000 0 45%,transparent 45% 48%,#000 48% 58%,transparent 58% 62%,#000 62% 70%,transparent 70% 75%,#000 75% 82%,transparent 82% 88%,#000 88%)}
+.head b{background:linear-gradient(90deg,var(--s),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat.s{border-color:rgba(255,95,162,.4);box-shadow:0 8px 26px rgba(255,95,162,.12)}
+.stat.t{border-color:rgba(46,230,214,.4);box-shadow:0 8px 26px rgba(46,230,214,.1)}
+.stat.open{outline:2px solid var(--gold);outline-offset:3px}
+.s .fg{filter:drop-shadow(0 0 5px var(--s))}.t .fg{filter:drop-shadow(0 0 5px var(--t))}
+.s .stbar.open{background:rgba(255,95,162,.16)}.t .stbar.open{background:rgba(46,230,214,.13)}
+.btn{background:linear-gradient(90deg,var(--s),var(--gold));color:var(--on)}
+.btn.alt{background:transparent;color:var(--ink)}
+.chip[aria-pressed="true"]{background:linear-gradient(90deg,var(--s),var(--gold));color:var(--on)}
+.nextc .t{background:linear-gradient(90deg,var(--ink),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tab[aria-selected="true"]{color:var(--gold)}
+.hold i{background:var(--t)}
+.warnbox{border:1px solid var(--gold);background:rgba(255,176,74,.12);border-radius:16px;padding:12px 14px;margin:0 0 12px;font-weight:600}
+.stepper{display:flex;align-items:center;gap:10px}.stepper b{min-width:64px;text-align:center;font-size:20px}.stepper .chip{padding:6px 18px;font-size:20px}
+:root{--f:#b9a2f0}@media (prefers-color-scheme:light){:root{--f:#7a55d6}}
+.stat.f{border-color:rgba(185,162,240,.4);cursor:pointer}.stat.f .ttl{color:var(--f)}.f .fg{stroke:var(--f);filter:drop-shadow(0 0 5px var(--f))}.f .gl{color:var(--f)}
+.avatar{font-weight:800;font-size:20px;color:var(--gold)}
+.hist{display:flex;gap:6px;align-items:flex-end;min-height:90px}.hist div{flex:1;text-align:center;font-size:11px;color:var(--mute)}.hist i{display:block;border-radius:6px 6px 0 0;background:linear-gradient(var(--gold),var(--s));min-height:3px;margin-bottom:4px}
+textarea,input[type=text],input[type=number]{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px;width:100%;user-select:text;-webkit-user-select:text}
+</style>
+</head>
+<body>
+<main>
+  <span id="clk" hidden></span>
+  <section class="view on" id="v-today">
+    <header class="head"><div><b id="hname">Peak Window</b><div id="stat" class="good">On track</div></div><div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 5-7 8-7s7 2 8 7"/></svg></div></header>
+    <div id="warn" class="warnbox" hidden></div>
+    <div class="sect">Fitness</div>
+    <div id="cards"></div>
+    <div class="nextc"><div><small>Next reminder in</small><div class="t" id="next">Paused</div></div><button class="btn" id="test">Start now</button></div>
+    <section class="panel"><h2>Last 7 days</h2><div class="hist" id="hist"></div><p class="sub" style="margin:8px 0 0">Workouts per day.</p></section>
+    <section class="panel">
+      <h2>Recovery</h2>
+      <p class="sub">Protein and sleep each cut the remaining recovery time in half. They reset after your next workout.</p>
+      <div class="row"><button class="btn alt" id="prot">Had protein</button><button class="btn alt" id="sleep">Slept well</button></div>
+    </section>
+  </section>
+  <section class="view" id="v-drills">
+    <h1>Drills</h1>
+    <section class="panel drills"><div id="drills"></div></section>
+    <section class="panel"><h2>Add your own</h2><div class="row"><input type="text" id="cdName" maxlength="24" placeholder="Drill name" aria-label="Drill name"></div><div class="row" style="margin-top:8px"><input type="number" id="cdN" min="1" max="300" value="10" style="width:84px" aria-label="Amount"><select id="cdT"><option value="reps">reps</option><option value="time">seconds</option></select><select id="cdS"><option value="s">Strength</option><option value="t">Stamina</option><option value="f">Focus</option></select></div><button class="btn" id="cdAdd" style="margin-top:10px">Add drill</button></section>
+  </section>
+  <section class="view" id="v-set">
+    <h1>Settings</h1>
+    <section class="panel">
+      <h2>Reminders</h2>
+      <p class="sub">How often a drill prompt arrives, from every 30 minutes up to every 12 hours.</p>
+      <div class="row" style="justify-content:space-between"><span>Remind me every</span>
+        <div class="stepper"><button class="chip" id="mMinus" aria-label="Shorter interval">−</button><b id="mVal">1 h</b><button class="chip" id="mPlus" aria-label="Longer interval">+</button></div></div>
+      <label class="row" style="margin-top:12px"><input type="checkbox" id="mOn"> Reminders on</label>
+      <div class="row" style="margin-top:14px"><button class="btn alt" id="notif">Allow notifications</button></div>
+    </section>
+    <section class="panel">
+      <h2>Quiet hours</h2>
+      <p class="sub">Silences reminders during these hours. Your windows keep counting down, so a window can still close overnight. You will be warned beforehand if gains are at risk.</p>
+      <div class="row"><label><input type="checkbox" id="qOn"> On</label><select id="qFrom" aria-label="From"></select><span>to</span><select id="qTo" aria-label="To"></select></div>
+      <p class="sub" id="qNote" style="margin:8px 0 0"></p>
+    </section>
+    <section class="panel">
+      <h2>Rest day token</h2>
+      <p class="sub" id="rtTxt"></p>
+      <button class="btn alt" id="rtBtn">Use rest day</button>
+    </section>
+    <section class="panel">
+      <h2>About</h2>
+      <p class="sub" style="margin:0">Inspired by the fitness system reported for GTA 6, with Strength and Stamina workout windows and levels from 1 to 4. This is an unofficial fan project, not affiliated with or endorsed by Rockstar Games or Take-Two Interactive. All game names belong to their owners.</p>
+    </section>
+    <section class="panel"><h2>Profile</h2><div class="row"><input type="text" id="nameIn" maxlength="14" placeholder="Your name" aria-label="Your name"></div><label class="row" style="margin-top:12px"><input type="checkbox" id="sndOn"> Sound effects</label></section>
+    <section class="panel"><h2>Backup</h2><p class="sub">Copy your progress to move it to a new phone, then paste it there and tap Import.</p><textarea id="bk" rows="3" aria-label="Backup data"></textarea><div class="row" style="margin-top:10px"><button class="btn alt" id="bkOut">Export</button><button class="btn alt" id="bkIn">Import</button></div></section>
+    <section class="panel" id="inst">
+      <h2>Install on your phone</h2>
+      <p class="sub" id="instTxt"></p>
+      <button class="btn" id="instBtn" hidden>Install app</button>
+    </section>
+  </section>
+</main>
+<nav class="tabbar" role="tablist" aria-label="Sections">
+  <button class="tab" role="tab" data-v="v-today" aria-selected="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>Today</button>
+  <button class="tab" role="tab" data-v="v-drills" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></svg>Drills</button>
+  <button class="tab" role="tab" data-v="v-set" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Settings</button>
+</nav>
+<div class="hud" id="hud" aria-live="polite"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const NAME={s:'Strength',t:'Stamina',f:'Focus'};
+const PACE={d:[12*36e5,12*36e5],q:[60e3,12e4]};
+const DECAY=15,GAIN=25,MAXXP=300;
+const DRILLS=[
+ {id:'push',name:'Push-ups',type:'reps',n:12,stat:'s',tip:'Chest to the floor, body straight'},
+ {id:'squat',name:'Bodyweight squats',type:'reps',n:20,stat:'s',tip:'Hips below knees, heels down'},
+ {id:'lunge',name:'Walking lunges',type:'reps',n:16,stat:'s',tip:'Count each leg'},
+ {id:'plank',name:'Plank hold',type:'time',n:40,stat:'s',tip:'Brace your core, do not sag'},
+ {id:'jj',name:'Jumping jacks',type:'reps',n:40,stat:'t',tip:'Stay light on your feet'},
+ {id:'burp',name:'Burpees',type:'reps',n:8,stat:'t',tip:'Smooth, not sloppy'},
+ {id:'high',name:'High knees',type:'time',n:45,stat:'t',tip:'Drive the knees up'}
+];
+let st={xp:{s:0,t:0,f:0},w:{},on:{push:1,squat:1,lunge:1,plank:1,jj:1,burp:1,high:1},mins:45,pace:'d',bp:0,bz:0,qh:{on:0,from:22,to:7},rt:{wk:'',until:0},name:'',snd:1,custom:[],log:{},snooze:0};
+try{const x=JSON.parse(localStorage.getItem('sgym2')||'null');if(x)st=Object.assign(st,x)}catch(e){}
+const save=()=>{try{localStorage.setItem('sgym2',JSON.stringify(st))}catch(e){}planNative()};
+const lvl=x=>Math.min(4,1+Math.floor(x/100));
+const fmt=ms=>{const s=Math.max(0,Math.ceil(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+'h '+m+'m':m?m+'m '+(s%60)+'s':s+'s'};
+const grace=()=>PACE[st.pace][1],cool=()=>PACE[st.pace][0];
+if(st.pace!=='d'){st.pace='d';st.w={}}
+const VALS=[30,60,90,120,150,180,240,300,360,420,480,540,600,660,720];
+const near=v=>VALS.reduce((b,x)=>Math.abs(x-v)<Math.abs(b-v)?x:b,VALS[0]);
+const mTxt=m=>m<60?m+' min':(m/60)+' h';
+if(!st.prev)st.prev=st.mins||60;st.prev=near(st.prev);if(st.mins)st.mins=near(st.mins);
+const FGRACE=7*864e5,FDECAY=5;
+const fmtD=ms=>{const h=Math.ceil(ms/36e5);return h>=48?Math.floor(h/24)+'d '+h%24+'h':fmt(ms)};
+if(!st.fd)st.fd=Date.now()+FGRACE;
+if(!st.xp.f)st.xp.f=0;if(!st.custom)st.custom=[];if(!st.log)st.log={};if(st.snd===undefined)st.snd=1;
+const RANK=['Rookie','Regular','Contender','Peak'];
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+DRILLS.push({id:'stretch',name:'Stretch flow',type:'time',n:45,stat:'f',tip:'Slow and easy'},{id:'breath',name:'Box breathing',type:'time',n:60,stat:'f',tip:'In 4, hold 4, out 4, hold 4'});
+st.custom.forEach(d=>DRILLS.push(d));
+if(st.on.stretch===undefined)st.on.stretch=1;if(st.on.breath===undefined)st.on.breath=1;
+const pad2=n=>String(n).padStart(2,'0');
+const dkey=(o=0)=>{const d=new Date();d.setDate(d.getDate()+o);return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())};
+function logAdd(t,v){const k=dkey(),e=st.log[k]||(st.log[k]={w:0,l:0});e[t]+=v;Object.keys(st.log).sort().slice(0,-14).forEach(x=>delete st.log[x])}
+function renderHist(){const el=$('#hist');if(!el)return;const days=[...Array(7).keys()].map(i=>dkey(i-6));let mx=1;days.forEach(d=>mx=Math.max(mx,(st.log[d]||{w:0}).w));
+  el.innerHTML=days.map(d=>{const e=st.log[d]||{w:0,l:0};return '<div title="'+(e.l?'-'+e.l+' XP lost':'')+'"><i style="height:'+Math.round(e.w/mx*50)+'px"></i>'+e.w+'<br>'+'SMTWTFS'[new Date(d+'T00:00').getDay()]+'</div>'}).join('')}
+const AVSVG=document.querySelector('.avatar').innerHTML;
+function renderAv(){const a=document.querySelector('.avatar');if(st.name&&st.name.trim())a.textContent=st.name.trim().charAt(0).toUpperCase();else a.innerHTML=AVSVG}
+let AC=null;function beep(f,d=.08,v=.06){if(!st.snd)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+['s','t'].forEach(k=>{if(!st.w[k]){const n=Date.now();st.w[k]={open:n,dead:n+cool()+grace()}}});
+
+const ICON={s:'<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><rect x="1" y="7" width="3" height="6" rx="1"/><rect x="4" y="5" width="3" height="10" rx="1"/><rect x="7" y="9" width="6" height="2"/><rect x="13" y="5" width="3" height="10" rx="1"/><rect x="16" y="7" width="3" height="6" rx="1"/></svg>',
+ t:'<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M11 1 4 11h5l-1 8 8-11h-5z"/></svg>'};
+const HG='<svg class="ico" viewBox="0 0 24 24"><path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9s8 4 8 9"/></svg>',CK='<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+const CIRC=2*Math.PI*30;
+$('#cards').innerHTML=['s','t'].map(k=>`<div class="stat ${k}" id="c-${k}"><div class="row2"><div><div class="ttl">${NAME[k]} Workout</div><div class="lvl" id="lv-${k}"></div></div><div class="ring"><svg viewBox="0 0 72 72"><circle class="bg" cx="36" cy="36" r="30"/><circle class="fg" id="rg-${k}" cx="36" cy="36" r="30" stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC}"/></svg><span class="gl">${ICON[k]}</span></div></div><div class="stbar" id="w-${k}"></div></div>`).join('');
+ICON.f='<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><circle cx="10" cy="10" r="2.5"/></svg>';
+$('#cards').insertAdjacentHTML('beforeend','<div class="stat f" id="c-f" role="button" tabindex="0"><div class="row2"><div><div class="ttl">Focus Workout</div><div class="lvl" id="lv-f"></div></div><div class="ring"><svg viewBox="0 0 72 72"><circle class="bg" cx="36" cy="36" r="30"/><circle class="fg" id="rg-f" cx="36" cy="36" r="30" stroke-dasharray="'+CIRC+'" stroke-dashoffset="'+CIRC+'"/></svg><span class="gl">'+ICON.f+'</span></div></div><div class="stbar rest" id="w-f"></div></div>');
+$('#c-f').onclick=()=>startFocus();
+function renderDrills(){$('#drills').innerHTML=DRILLS.map(d=>'<label><input type="checkbox" data-d="'+d.id+'" '+(st.on[d.id]?'checked':'')+'> '+esc(d.name)+'<small>'+(d.type==='reps'?d.n+' reps':d.n+' sec')+' · '+NAME[d.stat]+'</small>'+(d.custom?'<button class="chip" data-del="'+d.id+'" aria-label="Delete drill">x</button>':'')+'</label>').join('')}
+renderDrills();
+$('#drills').addEventListener('change',e=>{st.on[e.target.dataset.d]=e.target.checked?1:0;save()});
+document.querySelectorAll('[data-m]').forEach(c=>c.onclick=()=>{st.mins=+c.dataset.m;save();schedule();render()});
+document.querySelectorAll('[data-p]').forEach(c=>c.onclick=()=>{st.pace=c.dataset.p;const n=Date.now();['s','t'].forEach(k=>{st.w[k]={open:n,dead:n+cool()+grace()}});save();render();toast('Windows reset')});
+
+function render(){
+  const n=Date.now();
+  let soon=false;
+  for(const k of['s','t']){
+    const x=st.xp[k],L=lvl(x),w=st.w[k],open=n>=w.open;
+    $('#lv-'+k).textContent='Level '+L+'/4 · '+RANK[L-1];
+    $('#rg-'+k).style.strokeDashoffset=CIRC*(1-(L>=4&&x>=300?1:(x%100)/100));
+    $('#c-'+k).classList.toggle('open',open);
+    const el=$('#w-'+k);
+    if(open){const left=w.dead-n,pr=Math.max(0,Math.min(1,left/grace()));if(pr<.25)soon=true;
+      el.className='stbar open';el.innerHTML='<div class="stl"><span>Workout window</span><span>'+fmt(left)+'</span>'+HG+'</div><div class="track"><i style="width:'+(pr*100)+'%"></i></div>'}
+    else{el.className='stbar rest';el.innerHTML='<div class="stl"><span>Recovering. Opens in '+fmt(w.open-n)+'.</span>'+CK+'</div>'}
+  }
+  const ss=$('#stat');ss.textContent=soon?'Window closing':'On track';ss.className=soon?'warn':'good';showWarn();
+  {const xf=st.xp.f,Lf=lvl(xf);$('#lv-f').textContent='Level '+Lf+'/4 · '+RANK[Lf-1];$('#rg-f').style.strokeDashoffset=CIRC*(1-(Lf>=4&&xf>=300?1:(xf%100)/100))}
+  $('#w-f').textContent='Tap to train. Slow decay: train within '+fmtD(st.fd-n)+' or lose '+FDECAY+' XP.';
+  $('#hname').textContent=(st.name&&st.name.trim())||'Peak Window';renderAv();renderHist();
+  document.querySelectorAll('[data-m]').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.m===st.mins));
+  document.querySelectorAll('[data-p]').forEach(c=>c.setAttribute('aria-pressed',c.dataset.p===st.pace));
+  $('#prot').disabled=!!st.bp;$('#sleep').disabled=!!st.bz;
+  const act=n<st.rt.until,can=st.rt.wk!==wk();
+  $('#rtBtn').disabled=act||!can;
+  $('#rtTxt').textContent=act?'Rest day active until '+new Date(st.rt.until).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})+'. Your windows are frozen and prompts are paused.':can?'One per week. Freezes both windows and pauses prompts so you can skip without losing XP.':'Used this week. A new token arrives on Monday.';
+  $('#qNote').textContent=quiet()?'Quiet hours active: reminders are silenced, but your window clocks keep running.':'';
+  const bi=VALS.indexOf(st.prev);
+  $('#mVal').textContent=mTxt(st.prev);$('#mOn').checked=!!st.mins;$('#mMinus').disabled=bi<=0;$('#mPlus').disabled=bi>=VALS.length-1;
+}
+function boost(flag,label){
+  if(st[flag])return;const n=Date.now();let hit=false;
+  for(const k of['s','t']){const w=st.w[k];if(w.open>n){w.open=n+(w.open-n)/2;w.dead=w.open+grace();hit=true}}
+  st[flag]=1;save();render();toast(hit?label+': recovery halved':label+': nothing recovering');
+}
+$('#prot').onclick=()=>boost('bp','Protein');$('#sleep').onclick=()=>boost('bz','Sleep');
+
+let timer=null,due=0,busy=false;
+function schedule(){clearTimeout(timer);due=0;
+  if(st.mins){due=Date.now()+st.mins*6e4;timer=setTimeout(()=>{if(pickStat()&&!frozen()&&!quiet()&&Date.now()>=(st.snooze||0))prompt();else schedule()},st.mins*6e4)}
+  upNext();
+}
+function upNext(){
+  const el=$('#next');
+  $('#clk').textContent=new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  if(!due){el.textContent='Paused';return}
+  const s=Math.max(0,Math.round((due-Date.now())/1000));
+  const h=Math.floor(s/3600),mi=Math.floor(s%3600/60),sc=s%60,z=n=>String(n).padStart(2,'0');el.textContent=h?h+':'+z(mi)+':'+z(sc):z(mi)+':'+z(sc);
+}
+let lt=Date.now();
+function quiet(){if(!st.qh.on)return false;const h=new Date().getHours(),a=st.qh.from,b=st.qh.to;if(a===b)return false;return a<b?(h>=a&&h<b):(h>=a||h<b)}
+const frozen=()=>Date.now()<st.rt.until;
+const restLen=()=>st.pace==='q'?18e4:864e5;
+function wk(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function tick(){
+  const n=Date.now();let ch=false;const dt=n-lt;lt=n;const fz=frozen();
+  for(const k of['s','t']){const w=st.w[k];
+    if(fz&&n>=w.open){w.dead+=Math.min(dt,5000);ch=true}else if(n>w.dead){const before=lvl(st.xp[k]),cyc=1+Math.floor((n-w.dead)/grace()),loss=Math.min(st.xp[k],DECAY*Math.min(10,cyc));st.xp[k]-=loss;st.w[k]={open:n,dead:w.dead+cyc*grace()};ch=true;logAdd('l',loss);
+      toast(NAME[k]+' slipped: -'+loss+' XP');if(lvl(st.xp[k])<before)setTimeout(()=>banner(NAME[k]+' level lost'),500)}}
+  if(fz){st.fd+=Math.min(dt,5000);ch=true}
+  else if(n>st.fd){const cyc=1+Math.floor((n-st.fd)/FGRACE),loss=Math.min(st.xp.f,FDECAY*Math.min(10,cyc)),b=lvl(st.xp.f);st.xp.f-=loss;st.fd+=cyc*FGRACE;ch=true;
+    if(loss){logAdd('l',loss);toast('Focus slipped: -'+loss+' XP');if(lvl(st.xp.f)<b)setTimeout(()=>banner('Focus level lost'),500)}}
+  if(ch)save();render();upNext();
+}
+setInterval(tick,1000);
+
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2500)}
+function banner(t){const d=document.createElement('div');d.className='banner';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2100)}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+
+function pickStat(){
+  const n=Date.now(),o=['s','t'].filter(k=>n>=st.w[k].open);
+  o.sort((a,b)=>st.w[a].dead-st.w[b].dead);return o[0]||null;
+}
+function prompt(){
+  if(busy){schedule();return}
+  const k=pickStat();
+  if(!k){toast('Both windows are recovering');schedule();return}
+  const pool=DRILLS.filter(d=>d.stat===k&&st.on[d.id]);
+  const d=pool[Math.floor(Math.random()*pool.length)];
+  if(!d){toast('Turn on a '+NAME[k]+' drill');schedule();return}
+  busy=true;
+  const left=fmt(st.w[k].dead-Date.now());
+  try{if('Notification' in window&&Notification.permission==='granted')new Notification('Peak Window',{body:NAME[k]+' window closes in '+left+': '+d.name})}catch(e){}
+  buzz([80,60,80]);
+  const hud=$('#hud');
+  hud.innerHTML=`<div class="card"><div class="tag">${NAME[k]} window closes in ${left}</div>
+  <div class="big">${d.name} · ${d.type==='reps'?d.n+' reps':d.n+' sec'}</div>
+  <div style="color:var(--mute)">${d.tip}</div>
+  <button class="hold" id="hold"><i></i><span>Hold <span class="key">E</span> to start</span></button>
+  <button class="chip" id="skip" style="margin-top:10px">Not now</button></div>`;
+  let cleanup=()=>{};
+  $('#skip').onclick=()=>{cleanup();hud.innerHTML='';busy=false;schedule()};
+  cleanup=bindHold(d);
+}
+function bindHold(d){
+  const b=$('#hold'),fill=b.querySelector('i');let t0=0,raf=0,went=false;
+  const step=()=>{const p=Math.min(1,(performance.now()-t0)/700);fill.style.width=p*100+'%';if(p>=1&&!went){went=true;cleanup();start(d)}else raf=requestAnimationFrame(step)};
+  const down=()=>{if(t0)return;went=false;t0=performance.now();raf=requestAnimationFrame(step)};
+  const up=()=>{if(went)return;cancelAnimationFrame(raf);t0=0;fill.style.width='0'};
+  b.addEventListener('pointerdown',down);['pointerup','pointerleave','pointercancel'].forEach(e=>b.addEventListener(e,up));
+  const kd=e=>{if(e.key.toLowerCase()==='e'&&!e.repeat)down()},ku=e=>{if(e.key.toLowerCase()==='e')up()};
+  addEventListener('keydown',kd);addEventListener('keyup',ku);
+  function cleanup(){cancelAnimationFrame(raf);removeEventListener('keydown',kd);removeEventListener('keyup',ku)}
+  return cleanup;
+}
+function start(d){
+  buzz(60);
+  const hud=$('#hud');
+  if(d.type==='reps'){
+    let n=0;
+    hud.innerHTML=`<div class="card"><div class="tag">${d.name}</div><div class="count" id="c">0 / ${d.n}</div><div class="bar" title="Effort"><i id="eb" style="width:100%;background:var(--hot)"></i></div>
+    <button class="btn" id="rep" style="width:100%;margin-top:10px">Tap each rep or press Space</button></div>`;
+    const kd=e=>{if(e.code==='Space'){e.preventDefault();rep()}};
+    function rep(){n++;const c=$('#c');if(!c)return;c.textContent=n+' / '+d.n;const eb=$('#eb');if(eb)eb.style.width=(100-n/d.n*100)+'%';c.classList.remove('pulse');void c.offsetWidth;c.classList.add('pulse');buzz(20);beep(660,.05);if(n>=d.n){removeEventListener('keydown',kd);done(d)}}
+    addEventListener('keydown',kd);$('#rep').onclick=rep;
+  }else{
+    let left=d.n;
+    hud.innerHTML=`<div class="card"><div class="tag">${d.name}</div><div class="count" id="c">${left}s</div><div class="bar"><i id="eb" style="width:100%;background:var(--hot)"></i></div></div>`;
+    const iv=setInterval(()=>{left--;const c=$('#c');if(c)c.textContent=left+'s';const e=$('#eb');if(e)e.style.width=(left/d.n*100)+'%';if(left<=0){clearInterval(iv);done(d)}},1000);
+  }
+}
+function done(d){
+  const k=d.stat,n=Date.now(),w=st.w[k]||{open:0};
+  if(n<w.open){banner('Too soon');toast('No gain: still recovering')}
+  else{
+    const before=lvl(st.xp[k]);
+    st.xp[k]=Math.min(MAXXP,st.xp[k]+(k==='f'?15:GAIN));
+    if(k!=='f'){st.w[k]={open:n+cool(),dead:n+cool()+grace()};st.bp=0;st.bz=0}else st.fd=n+FGRACE
+    banner('Workout complete');logAdd('w',1);toast('+'+(k==='f'?15:GAIN)+' '+NAME[k]);buzz([100,50,100]);beep(523,.1);setTimeout(()=>beep(784,.18),110);
+    if(lvl(st.xp[k])>before)setTimeout(()=>{banner(NAME[k]+': '+RANK[lvl(st.xp[k])-1]);beep(880,.3)},2300);
+  }
+  save();render();rest();
+}
+function rest(){
+  let left=30;const hud=$('#hud');
+  hud.innerHTML=`<div class="card"><div class="tag">Rest</div><div class="count" id="c">${left}s</div><button class="chip" id="end">Done resting</button></div>`;
+  const fin=()=>{clearInterval(iv);hud.innerHTML='';busy=false;schedule()};
+  const iv=setInterval(()=>{left--;const c=$('#c');if(c)c.textContent=left+'s';if(left<=0)fin()},1000);
+  $('#end').onclick=fin;
+}
+$('#test').onclick=prompt;
+const LN=()=>window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications;
+const isNative=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+function quietAt(d){const q=st.qh;if(!q||!q.on||q.from===q.to)return false;const h=d.getHours();return q.from<q.to?(h>=q.from&&h<q.to):(h>=q.from||h<q.to)}
+function quietSpan(){
+  const q=st.qh;if(!q||!q.on||q.from===q.to)return null;
+  const now=new Date();
+  for(let d=-1;d<=1;d++){
+    const a=new Date(now);a.setDate(a.getDate()+d);a.setHours(q.from,0,0,0);
+    const b=new Date(a);b.setHours(q.to,0,0,0);if(b<=a)b.setDate(b.getDate()+1);
+    if(b>now)return[a.getTime(),b.getTime()];
+  }
+  return null;
+}
+const tfmt=ms=>new Date(ms).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+function riskInfo(){
+  const sp=quietSpan();if(!sp)return null;
+  const a=sp[0],b=sp[1],t0=Math.max(a,Date.now());
+  if(st.rt.until>t0)return null;
+  const hit=['s','t'].filter(k=>{const w=st.w[k];return w.dead>=t0&&w.dead<b&&w.open<=t0});
+  return hit.length?{a,b,hit}:null;
+}
+function riskBody(r){return r.hit.map(k=>'Your '+NAME[k]+' window closes at '+tfmt(st.w[k].dead)+'.').join(' ')+' Train before then or lose '+DECAY+' XP.'}
+function riskText(r){return (Date.now()>=r.a?'Reminders are silenced until '+tfmt(r.b)+', but your clocks keep running. ':'Quiet hours start at '+tfmt(r.a)+'. ')+riskBody(r)}
+function showWarn(){const el=$('#warn');if(!el)return;const r=riskInfo();if(r){el.textContent=riskText(r);el.hidden=false}else el.hidden=true}
+async function planNative(){
+  const ln=LN();if(!isNative()||!ln)return;
+  try{
+    const p=await ln.getPending();if(p.notifications.length)await ln.cancel({notifications:p.notifications});
+    if(!st.mins)return;
+    const out=[],now=Date.now(),g=grace(),idx={s:0,t:0};let id=1;
+    const dl=k=>{let d=st.w[k].dead;while(d<=now)d+=g;return d};
+    for(let i=1;i<=58;i++){
+      const t=now+i*st.mins*6e4,d=new Date(t);
+      if(quietAt(d)||t<st.rt.until||t<(st.snooze||0))continue;
+      const open=['s','t'].filter(k=>t>=st.w[k].open);if(!open.length)continue;
+      open.sort((a,b)=>dl(a)-dl(b));const k=open[0];
+      const pool=DRILLS.filter(x=>x.stat===k&&st.on[x.id]);if(!pool.length)continue;
+      const dr=pool[idx[k]++%pool.length];
+      out.push({id:id++,title:NAME[k]+' drill',body:dr.name+' \u00b7 '+(dr.type==='reps'?dr.n+' reps':dr.n+' sec'),schedule:{at:d,allowWhileIdle:true},actionTypeId:'DRILL'});
+    }
+    for(const k of['s','t']){const d=dl(k),t=d-Math.min(30*6e4,g*.25);
+      if(t>now&&t>=st.w[k].open&&t>=st.rt.until&&!quietAt(new Date(t)))out.push({id:100+(k==='s'?1:2),title:NAME[k]+' window closing',body:'Train soon or lose progress.',schedule:{at:new Date(t),allowWhileIdle:true}})}
+    const sp=quietSpan();
+    if(sp&&sp[0]>now){const r=riskInfo();if(r)out.push({id:201,title:'Gains at risk tonight',body:riskBody(r),schedule:{at:new Date(Math.max(sp[0]-30*6e4,now+6e4)),allowWhileIdle:true}})}
+    if(out.length)await ln.schedule({notifications:out});
+  }catch(e){}
+}
+$('#notif').onclick=async()=>{
+  const ln=LN();
+  if(isNative()&&ln){try{const r=await ln.requestPermissions();if(r.display==='granted'){planNative();toast('Reminders on')}else toast('Notifications blocked')}catch(e){toast('Could not enable')}return}
+  try{const r=await Notification.requestPermission();toast(r==='granted'?'Notifications on':'Notifications blocked')}catch(e){toast('Not supported here')}
+};
+const hrs=[...Array(24).keys()].map(h=>`<option value="${h}">${(h%12||12)+(h<12?' am':' pm')}</option>`).join('');
+$('#qFrom').innerHTML=hrs;$('#qTo').innerHTML=hrs;
+$('#qOn').checked=!!st.qh.on;$('#qFrom').value=st.qh.from;$('#qTo').value=st.qh.to;
+const qs=()=>{st.qh={on:$('#qOn').checked?1:0,from:+$('#qFrom').value,to:+$('#qTo').value};save();render()};
+['#qOn','#qFrom','#qTo'].forEach(s=>$(s).onchange=qs);
+$('#rtBtn').onclick=()=>{if(st.rt.wk===wk())return;st.rt={wk:wk(),until:Date.now()+restLen()};save();render();toast('Rest day on: gains protected')};
+let dp=null;
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),sa=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+$('#instTxt').textContent=sa?'You are running it as an installed app.':ios?'In Safari, tap Share, then Add to Home Screen. Open it from your home screen so it runs full screen.':'In Chrome or Edge, open the menu and choose Install app or Add to Home screen.';
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#instBtn').hidden=false});
+$('#instBtn').onclick=async()=>{if(!dp)return;dp.prompt();try{await dp.userChoice}catch(e){}dp=null;$('#instBtn').hidden=true};
+function startFocus(){if(busy)return;const pool=DRILLS.filter(d=>d.stat==='f'&&st.on[d.id]);if(!pool.length){toast('Turn on a Focus drill');return}busy=true;$('#hud').innerHTML='';start(pool[Math.floor(Math.random()*pool.length)])}
+$('#cdAdd').onclick=()=>{const nm=$('#cdName').value.trim().slice(0,24),n=Math.max(1,Math.min(300,+$('#cdN').value||10));if(!nm){toast('Name your drill');return}
+  const d={id:'c'+Date.now(),name:nm,type:$('#cdT').value,n,stat:$('#cdS').value,tip:'Your drill',custom:1};DRILLS.push(d);st.custom.push(d);st.on[d.id]=1;save();renderDrills();$('#cdName').value='';toast('Drill added')};
+$('#drills').addEventListener('click',e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id)return;e.preventDefault();const i=DRILLS.findIndex(x=>x.id===id);if(i>-1)DRILLS.splice(i,1);st.custom=st.custom.filter(x=>x.id!==id);delete st.on[id];save();renderDrills()});
+$('#nameIn').value=st.name||'';$('#nameIn').oninput=e=>{st.name=e.target.value.slice(0,14);save();render()};
+$('#sndOn').checked=!!st.snd;$('#sndOn').onchange=e=>{st.snd=e.target.checked?1:0;save()};
+$('#bkOut').onclick=async()=>{const t=JSON.stringify(st);$('#bk').value=t;try{await navigator.clipboard.writeText(t);toast('Copied')}catch(e){$('#bk').select();toast('Select and copy the text')}};
+$('#bkIn').onclick=()=>{try{const x=JSON.parse($('#bk').value);if(!x||!x.xp||!x.w)throw 0;localStorage.setItem('sgym2',JSON.stringify(x));toast('Imported');setTimeout(()=>location.reload(),600)}catch(e){toast('That does not look like a backup')}};
+function setInt(v){st.prev=v;if(st.mins)st.mins=v;save();schedule();render()}
+$('#mMinus').onclick=()=>setInt(VALS[Math.max(0,VALS.indexOf(st.prev)-1)]);
+$('#mPlus').onclick=()=>setInt(VALS[Math.min(VALS.length-1,VALS.indexOf(st.prev)+1)]);
+$('#mOn').onchange=e=>{st.mins=e.target.checked?st.prev:0;save();schedule();render()};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===b.dataset.v));scrollTo(0,0);buzz(10)});
+tick();schedule();
+if(isNative()){$('#inst').hidden=true;const ln=LN();if(ln){ln.registerActionTypes({types:[{id:'DRILL',actions:[{id:'start',title:'Start'},{id:'snooze',title:'Snooze 1 h'}]}]}).catch(()=>{});ln.addListener('localNotificationActionPerformed',e=>{if(e.actionId==='snooze'){st.snooze=Date.now()+36e5;save();toast('Snoozed for 1 hour')}else setTimeout(prompt,400)})}document.addEventListener('visibilitychange',()=>{if(!document.hidden)planNative()});planNative()}
+</script>
+</body>
+</html>
