@@ -25,9 +25,18 @@ jobs:
           test -f www/index.html || { echo "index.html is missing from the repository"; exit 1; }
       - run: npx cap add android
       - run: npx cap sync android
-      - name: Generate icons if assets exist
+      - name: Set app name
         run: |
-          if [ -d assets ]; then npx capacitor-assets generate --android; fi
+          f=android/app/src/main/res/values/strings.xml
+          sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Gains Through Action</string>#; s#<string name="title_activity_main">[^<]*</string>#<string name="title_activity_main">Gains Through Action</string>#' "$f"
+      - name: Generate icons if provided
+        continue-on-error: true
+        run: |
+          mkdir -p assets
+          for f in icon-only.png icon-foreground.png icon-background.png; do
+            if [ -f "$f" ]; then cp "$f" assets/; fi
+          done
+          if [ -f assets/icon-only.png ]; then npx capacitor-assets generate --android; fi
       - name: Allow notifications and exact alarms
         run: |
           f=android/app/src/main/AndroidManifest.xml
