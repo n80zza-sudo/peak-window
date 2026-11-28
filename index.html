@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Peak Window Reminders</title>
+<title>Peak Gains</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg">
 <meta name="theme-color" content="#12091f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Peak Window">
+<meta name="apple-mobile-web-app-title" content="Peak Gains">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap">
 <style>
 :root{--bg:#121214;--panel:#1b1b1f;--card:#0e0e10;--ink:#f3f3f5;--mute:#9b9ba4;--line:#2b2b31;--shadow:rgba(0,0,0,.5);--s:#e7a3c3;--t:#6fe3b4;--hot:#e7a3c3;--cool:#6fe3b4;--gold:#f0c26a;--on:#1a1020;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -115,27 +115,57 @@ body::before{content:"";position:fixed;z-index:-1;top:-70px;right:-50px;width:23
 .avatar{font-weight:800;font-size:20px;color:var(--gold)}
 .hist{display:flex;gap:6px;align-items:flex-end;min-height:90px}.hist div{flex:1;text-align:center;font-size:11px;color:var(--mute)}.hist i{display:block;border-radius:6px 6px 0 0;background:linear-gradient(var(--gold),var(--s));min-height:3px;margin-bottom:4px}
 textarea,input[type=text],input[type=number]{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px;width:100%;user-select:text;-webkit-user-select:text}
+:root{padding-top:0;padding-bottom:0}
+html{background:var(--bg)}
+main{padding-top:calc(max(env(safe-area-inset-top,0px),24px) + 8px)}
+.tabbar{padding-bottom:max(env(safe-area-inset-bottom,0px),6px)}
+.hud{bottom:calc(72px + max(env(safe-area-inset-bottom,0px),6px))}
+.toast{top:calc(max(env(safe-area-inset-top,0px),24px) + 8px)}
+.avatar{cursor:pointer}.avatar:focus-visible{outline:3px solid var(--cool);outline-offset:2px}
+.dlg{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(0,0,0,.55);padding:16px}
+.dlg .card{width:100%;max-width:360px;animation:none}
+.ch{margin-bottom:14px}.ch small{color:var(--mute)}.ch .stl{margin-bottom:6px}
+.bds{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bd{border:1px solid var(--line);border-radius:14px;padding:10px;opacity:.45}
+.bd.on{opacity:1;border-color:var(--gold);background:rgba(255,176,74,.1)}.bd b{display:block}.bd small{color:var(--mute);font-size:12px}
+.ex{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.vis{width:84px;height:84px;flex:none;border-radius:16px;background:var(--card);padding:6px}
+.vis svg{width:100%;height:100%}.vs{color:var(--s)}.vt{color:var(--t)}.vf{color:var(--f)}
+.exb{flex:1;min-width:0}.exb b{font-size:17px}.exb small{display:block;margin-left:0;color:var(--mute)}.exb p{margin:4px 0 8px;color:var(--mute);font-size:14px}
+.ex label{border:0;padding:0}.drills .ex{border-bottom:1px solid var(--line)}
+.fa,.fb{animation:fl 1.6s infinite}.fb{animation-delay:-.8s}
+@keyframes fl{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.fb{display:none}.fa{animation:none}}
+:root[data-th="ocean"]{--s:#5ab0ff;--t:#6ff0d0;--hot:#5ab0ff;--cool:#6ff0d0;--gold:#9be15d;--bg:#071a2b;--panel:#0f2740;--card:#0a1e33;--line:#1d3b5a;--ink:#eef6ff;--mute:#8fb0cf;--on:#06121f}
+:root[data-th="ember"]{--s:#ff7a45;--t:#ffd166;--hot:#ff7a45;--cool:#ffd166;--gold:#ff4d4d;--bg:#1f0d08;--panel:#2e150c;--card:#240f08;--line:#4a2416;--ink:#fff1ea;--mute:#d0a28f;--on:#1f0d08}
+:root[data-th="mono"]{--s:#e6e6ea;--t:#a0a0aa;--hot:#e6e6ea;--cool:#a0a0aa;--gold:#ffffff;--bg:#0b0b0d;--panel:#16161a;--card:#101013;--line:#2a2a30;--ink:#f4f4f6;--mute:#9a9aa3;--on:#0b0b0d}
 </style>
 </head>
 <body>
 <main>
   <span id="clk" hidden></span>
   <section class="view on" id="v-today">
-    <header class="head"><div><b id="hname">Peak Window</b><div id="stat" class="good">On track</div></div><div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 5-7 8-7s7 2 8 7"/></svg></div></header>
+    <header class="head"><div><b id="hname">Peak Gains</b><div id="stat" class="good">On track</div></div><div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 5-7 8-7s7 2 8 7"/></svg></div></header>
     <div id="warn" class="warnbox" hidden></div>
     <div class="sect">Fitness</div>
     <div id="cards"></div>
     <div class="nextc"><div><small>Next reminder in</small><div class="t" id="next">Paused</div></div><button class="btn" id="test">Start now</button></div>
-    <section class="panel"><h2>Last 7 days</h2><div class="hist" id="hist"></div><p class="sub" style="margin:8px 0 0">Workouts per day.</p></section>
+    
     <section class="panel">
       <h2>Recovery</h2>
       <p class="sub">Protein and sleep each cut the remaining recovery time in half. They reset after your next workout.</p>
       <div class="row"><button class="btn alt" id="prot">Had protein</button><button class="btn alt" id="sleep">Slept well</button></div>
     </section>
   </section>
+  <section class="view" id="v-prog">
+    <h1>Progress</h1>
+    <section class="panel"><h2 id="strk">0 day streak</h2><p class="sub" id="strkSub" style="margin:0"></p></section>
+    <section class="panel"><h2>This week</h2><div id="chal"></div></section>
+    <section class="panel"><h2>Last 7 days</h2><div class="hist" id="hist"></div><p class="sub" style="margin:8px 0 0">Workouts per day.</p></section>
+    <section class="panel"><h2>Badges</h2><div class="bds" id="badges"></div></section>
+    <section class="panel"><h2>Themes</h2><div class="row" id="themes"></div><p class="sub" id="themeHint" style="margin:8px 0 0"></p></section>
+  </section>
   <section class="view" id="v-drills">
     <h1>Drills</h1>
-    <section class="panel drills"><div id="drills"></div></section>
+    <section class="panel drills"><div class="row" role="group" aria-label="Exercise type"><button class="chip" data-lib="s">Strength</button><button class="chip" data-lib="t">Stamina</button><button class="chip" data-lib="f">Focus</button></div><div id="drills" style="margin-top:8px"></div></section>
     <section class="panel"><h2>Add your own</h2><div class="row"><input type="text" id="cdName" maxlength="24" placeholder="Drill name" aria-label="Drill name"></div><div class="row" style="margin-top:8px"><input type="number" id="cdN" min="1" max="300" value="10" style="width:84px" aria-label="Amount"><select id="cdT"><option value="reps">reps</option><option value="time">seconds</option></select><select id="cdS"><option value="s">Strength</option><option value="t">Stamina</option><option value="f">Focus</option></select></div><button class="btn" id="cdAdd" style="margin-top:10px">Add drill</button></section>
   </section>
   <section class="view" id="v-set">
@@ -161,19 +191,18 @@ textarea,input[type=text],input[type=number]{font:inherit;color:var(--ink);backg
     </section>
     <section class="panel">
       <h2>About</h2>
-      <p class="sub" style="margin:0">Inspired by the fitness system reported for GTA 6, with Strength and Stamina workout windows and levels from 1 to 4. This is an unofficial fan project, not affiliated with or endorsed by Rockstar Games or Take-Two Interactive. All game names belong to their owners.</p>
+      <p class="sub" style="margin:8px 0 0">Build <span id="bld"></span></p>
     </section>
-    <section class="panel"><h2>Profile</h2><div class="row"><input type="text" id="nameIn" maxlength="14" placeholder="Your name" aria-label="Your name"></div><label class="row" style="margin-top:12px"><input type="checkbox" id="sndOn"> Sound effects</label></section>
+    <section class="panel" id="dev" hidden><h2>Test mode</h2><p class="sub">For testing only. Tap the app title five times to turn this off.</p><div class="row"><button class="btn alt" id="dN">Test notification in 10 s</button><button class="btn alt" id="dF">Fast windows: off</button><button class="btn alt" id="d1">1-minute reminders</button><button class="btn alt" id="dP">Show scheduled reminders</button><button class="btn alt" id="dX">Exit test mode</button></div><div class="sub" id="pend" style="margin-top:10px"></div></section>
+    <section class="panel" id="help" hidden><h2>Reminders not arriving?</h2><ol class="sub" style="padding-left:20px;margin:0 0 12px"><li>Tap Allow notifications above.</li><li>Tap the button below to allow exact reminders.</li><li>In phone Settings, open Apps, then Peak Gains, then Battery, and choose Unrestricted.</li><li>Open the app once a day so it can refresh the schedule.</li></ol><button class="btn alt" id="exBtn">Allow exact reminders</button></section>
+    <section class="panel"><h2>Sound</h2><label class="row"><input type="checkbox" id="sndOn"> Sound effects</label></section>
     <section class="panel"><h2>Backup</h2><p class="sub">Copy your progress to move it to a new phone, then paste it there and tap Import.</p><textarea id="bk" rows="3" aria-label="Backup data"></textarea><div class="row" style="margin-top:10px"><button class="btn alt" id="bkOut">Export</button><button class="btn alt" id="bkIn">Import</button></div></section>
-    <section class="panel" id="inst">
-      <h2>Install on your phone</h2>
-      <p class="sub" id="instTxt"></p>
-      <button class="btn" id="instBtn" hidden>Install app</button>
-    </section>
+    <section class="panel"><h2>Reset and help</h2><p class="sub">Reset erases levels, streaks and badges. Your name, drills and settings stay.</p><div class="row"><button class="btn alt" id="rsBtn">Reset progress</button><button class="btn alt" id="tourBtn">How it works</button></div></section>
   </section>
 </main>
 <nav class="tabbar" role="tablist" aria-label="Sections">
   <button class="tab" role="tab" data-v="v-today" aria-selected="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>Today</button>
+  <button class="tab" role="tab" data-v="v-prog" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Progress</button>
   <button class="tab" role="tab" data-v="v-drills" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></svg>Drills</button>
   <button class="tab" role="tab" data-v="v-set" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Settings</button>
 </nav>
@@ -199,15 +228,16 @@ const save=()=>{try{localStorage.setItem('sgym2',JSON.stringify(st))}catch(e){}p
 const lvl=x=>Math.min(4,1+Math.floor(x/100));
 const fmt=ms=>{const s=Math.max(0,Math.ceil(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+'h '+m+'m':m?m+'m '+(s%60)+'s':s+'s'};
 const grace=()=>PACE[st.pace][1],cool=()=>PACE[st.pace][0];
-if(st.pace!=='d'){st.pace='d';st.w={}}
+if(st.pace!=='d'&&!st.dev){st.pace='d';st.w={}}
 const VALS=[30,60,90,120,150,180,240,300,360,420,480,540,600,660,720];
 const near=v=>VALS.reduce((b,x)=>Math.abs(x-v)<Math.abs(b-v)?x:b,VALS[0]);
 const mTxt=m=>m<60?m+' min':(m/60)+' h';
-if(!st.prev)st.prev=st.mins||60;st.prev=near(st.prev);if(st.mins)st.mins=near(st.mins);
+if(!st.prev)st.prev=st.mins||60;st.prev=near(st.prev);if(st.mins&&!st.dev)st.mins=near(st.mins);
+const COARSE=matchMedia('(pointer:coarse)').matches;
 const FGRACE=7*864e5,FDECAY=5;
 const fmtD=ms=>{const h=Math.ceil(ms/36e5);return h>=48?Math.floor(h/24)+'d '+h%24+'h':fmt(ms)};
 if(!st.fd)st.fd=Date.now()+FGRACE;
-if(!st.xp.f)st.xp.f=0;if(!st.custom)st.custom=[];if(!st.log)st.log={};if(st.snd===undefined)st.snd=1;
+if(!st.ach)st.ach={};if(!st.total)st.total=0;if(!st.xp.f)st.xp.f=0;if(!st.custom)st.custom=[];if(!st.log)st.log={};if(st.snd===undefined)st.snd=1;
 const RANK=['Rookie','Regular','Contender','Peak'];
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 DRILLS.push({id:'stretch',name:'Stretch flow',type:'time',n:45,stat:'f',tip:'Slow and easy'},{id:'breath',name:'Box breathing',type:'time',n:60,stat:'f',tip:'In 4, hold 4, out 4, hold 4'});
@@ -231,7 +261,34 @@ $('#cards').innerHTML=['s','t'].map(k=>`<div class="stat ${k}" id="c-${k}"><div 
 ICON.f='<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><circle cx="10" cy="10" r="2.5"/></svg>';
 $('#cards').insertAdjacentHTML('beforeend','<div class="stat f" id="c-f" role="button" tabindex="0"><div class="row2"><div><div class="ttl">Focus Workout</div><div class="lvl" id="lv-f"></div></div><div class="ring"><svg viewBox="0 0 72 72"><circle class="bg" cx="36" cy="36" r="30"/><circle class="fg" id="rg-f" cx="36" cy="36" r="30" stroke-dasharray="'+CIRC+'" stroke-dashoffset="'+CIRC+'"/></svg><span class="gl">'+ICON.f+'</span></div></div><div class="stbar rest" id="w-f"></div></div>');
 $('#c-f').onclick=()=>startFocus();
-function renderDrills(){$('#drills').innerHTML=DRILLS.map(d=>'<label><input type="checkbox" data-d="'+d.id+'" '+(st.on[d.id]?'checked':'')+'> '+esc(d.name)+'<small>'+(d.type==='reps'?d.n+' reps':d.n+' sec')+' · '+NAME[d.stat]+'</small>'+(d.custom?'<button class="chip" data-del="'+d.id+'" aria-label="Delete drill">x</button>':'')+'</label>').join('')}
+const N0=[50,15,50,24,50,52,44,38,42,50,56,38,58,50,46,70,45,90,54,70,55,90];
+const PU=[[78,44,68,48,40,62,68,66,68,86,68,66,68,86,26,74,12,86,26,74,12,86],[76,70,66,72,38,76,56,78,68,86,56,78,68,86,26,81,12,86,26,81,12,86]];
+const EX={
+ push:{p:PU,d:'Hands under shoulders, body in one straight line. Lower your chest to the floor, then press back up.'},
+ squat:{p:[[48,15,48,24,48,52,58,32,68,32,58,32,68,32,50,72,50,90,50,72,50,90],[44,32,42,40,32,64,54,44,64,44,54,44,64,44,52,68,46,90,52,68,46,90]],d:'Feet shoulder-width apart. Sit your hips back and down, keep your chest up, then drive through your heels.'},
+ lunge:{p:[[48,15,48,24,48,52,46,38,46,48,46,38,46,48,54,70,58,90,44,70,40,90],[48,26,48,34,48,58,46,46,46,56,46,46,46,56,64,66,66,90,36,80,26,88]],d:'Step forward and lower until both knees bend about 90 degrees, then push off and switch legs.'},
+ plank:{p:[[78,60,68,64,40,68,68,82,80,84,68,82,80,84,26,76,12,84,26,76,12,84],[78,58,68,62,40,64,68,82,80,84,68,82,80,84,26,74,12,84,26,74,12,84]],d:'Forearms and toes on the floor, body straight. Brace your core and breathe steadily.'},
+ bridge:{p:[[14,80,24,80,50,80,36,83,46,84,36,83,46,84,64,62,72,84,64,62,72,84],[14,78,24,78,50,62,36,82,46,84,36,82,46,84,66,58,72,84,66,58,72,84]],d:'Lie on your back with knees bent. Lift your hips until your body forms a line, squeeze, then lower.'},
+ jj:{p:[N0,[50,15,50,24,50,52,38,22,30,8,62,22,70,8,40,70,32,90,60,70,68,90]],d:'Jump your feet wide while your arms sweep overhead, then jump back together. Keep a steady rhythm.'},
+ burp:{p:[[50,18,50,27,50,55,42,16,40,6,58,16,60,6,46,72,45,90,54,72,55,90],PU[0]],d:'Drop to a plank, step or jump back in, then explode up with a jump. Move smoothly.'},
+ high:{p:[[50,15,50,24,50,52,40,36,46,28,60,34,54,26,60,56,58,72,54,70,55,90],[50,15,50,24,50,52,60,34,54,26,40,36,46,28,46,70,45,90,60,56,58,72]],d:'Run on the spot, driving each knee up toward hip height. Stay tall and pump your arms.'},
+ climb:{p:[[78,44,68,48,40,62,68,66,68,86,68,66,68,86,54,70,46,82,26,74,12,86],[78,44,68,48,40,62,68,66,68,86,68,66,68,86,26,74,12,86,54,70,46,82]],d:'From a high plank, drive one knee toward your chest, then switch quickly. Keep your hips low.'},
+ stretch:{p:[[50,20,50,29,50,57,45,16,47,4,55,16,53,4,46,74,45,92,54,74,55,92],[30,76,36,70,50,54,34,82,34,92,34,82,34,92,48,74,48,92,48,74,48,92]],d:'Reach tall, then fold forward and let your arms hang. Breathe slowly and relax your neck.'},
+ neck:{p:[[43,17,50,25,50,53,44,40,42,52,56,40,58,52,46,70,45,90,54,70,55,90],[57,17,50,25,50,53,44,40,42,52,56,40,58,52,46,70,45,90,54,70,55,90]],d:'Slowly tilt your head side to side and roll your shoulders back. Keep movements small and pain-free.'},
+ breath:{box:1,d:'Breathe in for 4, hold for 4, out for 4, hold for 4. Follow the dot around the square.'}};
+DRILLS.push({id:'bridge',name:'Glute bridge',type:'reps',n:15,stat:'s',tip:'Squeeze at the top'},{id:'climb',name:'Mountain climbers',type:'time',n:30,stat:'t',tip:'Keep hips low'},{id:'neck',name:'Neck and shoulder rolls',type:'time',n:40,stat:'f',tip:'Slow and pain-free'});
+['bridge','climb','neck'].forEach(i=>{if(st.on[i]===undefined)st.on[i]=1});
+const BOX='<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><rect x="22" y="22" width="56" height="56" rx="8" opacity=".35"/><circle r="6" fill="currentColor" stroke="none"><animateMotion dur="16s" repeatCount="indefinite" path="M22 22H78V78H22Z"/></circle></svg>';
+const pose=a=>'<circle cx="'+a[0]+'" cy="'+a[1]+'" r="6"/><path d="M'+a[2]+' '+a[3]+'L'+a[4]+' '+a[5]+'M'+a[2]+' '+a[3]+'L'+a[6]+' '+a[7]+'L'+a[8]+' '+a[9]+'M'+a[2]+' '+a[3]+'L'+a[10]+' '+a[11]+'L'+a[12]+' '+a[13]+'M'+a[4]+' '+a[5]+'L'+a[14]+' '+a[15]+'L'+a[16]+' '+a[17]+'M'+a[4]+' '+a[5]+'L'+a[18]+' '+a[19]+'L'+a[20]+' '+a[21]+'"/>';
+const fig=id=>{const x=EX[id];if(!x)return '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5"><circle cx="50" cy="50" r="22"/></svg>';if(x.box)return BOX;
+  return '<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><g class="fa">'+pose(x.p[0])+'</g><g class="fb">'+pose(x.p[1])+'</g></svg>'};
+const scaled=d=>Object.assign({},d,{n:Math.round(d.n*(1+.15*(lvl(st.xp[d.stat])-1)))});
+let libStat='s';
+function renderDrills(){
+  document.querySelectorAll('[data-lib]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lib===libStat));
+  $('#drills').innerHTML=DRILLS.filter(d=>d.stat===libStat).map(d=>{const x=EX[d.id]||{},a=scaled(d);return '<div class="ex"><div class="vis v'+d.stat+'">'+fig(d.id)+'</div><div class="exb"><b>'+esc(d.name)+'</b><small>'+(d.type==='reps'?a.n+' reps':a.n+' sec')+'</small><p>'+esc(x.d||d.tip||'Your own drill.')+'</p><div class="row"><label><input type="checkbox" data-d="'+d.id+'" '+(st.on[d.id]?'checked':'')+'> In rotation</label><button class="chip" data-try="'+d.id+'">Try</button>'+(d.custom?'<button class="chip" data-del="'+d.id+'" aria-label="Delete drill">x</button>':'')+'</div></div></div>'}).join('')}
+document.querySelectorAll('[data-lib]').forEach(b=>b.onclick=()=>{libStat=b.dataset.lib;renderDrills()});
+$('#drills').addEventListener('click',e=>{const id=e.target.dataset&&e.target.dataset.try;if(!id||busy)return;const d=DRILLS.find(x=>x.id===id);if(!d)return;busy=true;$('#hud').innerHTML='';start(scaled(d))});
 renderDrills();
 $('#drills').addEventListener('change',e=>{st.on[e.target.dataset.d]=e.target.checked?1:0;save()});
 document.querySelectorAll('[data-m]').forEach(c=>c.onclick=()=>{st.mins=+c.dataset.m;save();schedule();render()});
@@ -253,7 +310,8 @@ function render(){
   const ss=$('#stat');ss.textContent=soon?'Window closing':'On track';ss.className=soon?'warn':'good';showWarn();
   {const xf=st.xp.f,Lf=lvl(xf);$('#lv-f').textContent='Level '+Lf+'/4 · '+RANK[Lf-1];$('#rg-f').style.strokeDashoffset=CIRC*(1-(Lf>=4&&xf>=300?1:(xf%100)/100))}
   $('#w-f').textContent='Tap to train. Slow decay: train within '+fmtD(st.fd-n)+' or lose '+FDECAY+' XP.';
-  $('#hname').textContent=(st.name&&st.name.trim())||'Peak Window';renderAv();renderHist();
+  $('#dev').hidden=!st.dev;$('#dF').textContent='Fast windows: '+(st.pace==='q'?'on':'off');
+  $('#hname').textContent=(st.name&&st.name.trim())||'Peak Gains';renderAv();renderHist();renderProg();renderThemes();
   document.querySelectorAll('[data-m]').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.m===st.mins));
   document.querySelectorAll('[data-p]').forEach(c=>c.setAttribute('aria-pressed',c.dataset.p===st.pace));
   $('#prot').disabled=!!st.bp;$('#sleep').disabled=!!st.bz;
@@ -272,9 +330,14 @@ function boost(flag,label){
 $('#prot').onclick=()=>boost('bp','Protein');$('#sleep').onclick=()=>boost('bz','Sleep');
 
 let timer=null,due=0,busy=false;
-function schedule(){clearTimeout(timer);due=0;
-  if(st.mins){due=Date.now()+st.mins*6e4;timer=setTimeout(()=>{if(pickStat()&&!frozen()&&!quiet()&&Date.now()>=(st.snooze||0))prompt();else schedule()},st.mins*6e4)}
-  upNext();
+const persist=()=>{try{localStorage.setItem('sgym2',JSON.stringify(st))}catch(e){}};
+function schedule(keep){
+  clearTimeout(timer);const n=Date.now();
+  if(!st.mins){due=0;st.nextAt=0;persist();upNext();planNative();return}
+  if(keep&&st.nextAt){let c=0;while(st.nextAt<=n&&c++<5000)st.nextAt+=st.mins*6e4}else st.nextAt=n+st.mins*6e4;
+  due=st.nextAt;persist();
+  timer=setTimeout(()=>{if(pickStat()&&!frozen()&&!quiet()&&Date.now()>=(st.snooze||0))prompt();else schedule()},Math.min(due-n,2147483000));
+  upNext();planNative();
 }
 function upNext(){
   const el=$('#next');
@@ -313,17 +376,17 @@ function prompt(){
   const k=pickStat();
   if(!k){toast('Both windows are recovering');schedule();return}
   const pool=DRILLS.filter(d=>d.stat===k&&st.on[d.id]);
-  const d=pool[Math.floor(Math.random()*pool.length)];
+  const d0=pool[Math.floor(Math.random()*pool.length)],d=d0&&scaled(d0);
   if(!d){toast('Turn on a '+NAME[k]+' drill');schedule();return}
   busy=true;
   const left=fmt(st.w[k].dead-Date.now());
-  try{if('Notification' in window&&Notification.permission==='granted')new Notification('Peak Window',{body:NAME[k]+' window closes in '+left+': '+d.name})}catch(e){}
+  try{if('Notification' in window&&Notification.permission==='granted')new Notification('Peak Gains',{body:NAME[k]+' window closes in '+left+': '+d.name})}catch(e){}
   buzz([80,60,80]);
   const hud=$('#hud');
   hud.innerHTML=`<div class="card"><div class="tag">${NAME[k]} window closes in ${left}</div>
   <div class="big">${d.name} · ${d.type==='reps'?d.n+' reps':d.n+' sec'}</div>
   <div style="color:var(--mute)">${d.tip}</div>
-  <button class="hold" id="hold"><i></i><span>Hold <span class="key">E</span> to start</span></button>
+  <button class="hold" id="hold"><i></i><span>${COARSE?'Press and hold to start':'Hold <span class="key">E</span> to start'}</span></button>
   <button class="chip" id="skip" style="margin-top:10px">Not now</button></div>`;
   let cleanup=()=>{};
   $('#skip').onclick=()=>{cleanup();hud.innerHTML='';busy=false;schedule()};
@@ -346,9 +409,17 @@ function start(d){
   if(d.type==='reps'){
     let n=0;
     hud.innerHTML=`<div class="card"><div class="tag">${d.name}</div><div class="count" id="c">0 / ${d.n}</div><div class="bar" title="Effort"><i id="eb" style="width:100%;background:var(--hot)"></i></div>
-    <button class="btn" id="rep" style="width:100%;margin-top:10px">Tap each rep or press Space</button></div>`;
+    <button class="chip" id="auto" style="margin-top:10px">Auto-count (beta): off</button>
+    <button class="btn" id="rep" style="width:100%;margin-top:10px">${COARSE?'Tap for each rep':'Tap each rep or press Space'}</button></div>`;
     const kd=e=>{if(e.code==='Space'){e.preventDefault();rep()}};
-    function rep(){n++;const c=$('#c');if(!c)return;c.textContent=n+' / '+d.n;const eb=$('#eb');if(eb)eb.style.width=(100-n/d.n*100)+'%';c.classList.remove('pulse');void c.offsetWidth;c.classList.add('pulse');buzz(20);beep(660,.05);if(n>=d.n){removeEventListener('keydown',kd);done(d)}}
+    function rep(){n++;const c=$('#c');if(!c)return;c.textContent=n+' / '+d.n;const eb=$('#eb');if(eb)eb.style.width=(100-n/d.n*100)+'%';c.classList.remove('pulse');void c.offsetWidth;c.classList.add('pulse');buzz(20);beep(660,.05);if(n>=d.n){removeEventListener('keydown',kd);if(stopAuto)stopAuto();done(d)}}
+    let stopAuto=null;
+    $('#auto').onclick=async()=>{const b=$('#auto');if(stopAuto){stopAuto();stopAuto=null;b.textContent='Auto-count (beta): off';return}
+      try{if(typeof DeviceMotionEvent!=='undefined'&&DeviceMotionEvent.requestPermission){const r=await Promise.race([DeviceMotionEvent.requestPermission(),new Promise(res=>setTimeout(()=>res('granted'),1500))]);if(r==='denied'){toast('Motion access denied');return}}}catch(e){}
+      let last=0,lp=9.8,prev=9.8,rising=false;
+      const h=e=>{const a=e.accelerationIncludingGravity;if(!a)return;const m=Math.sqrt((a.x||0)**2+(a.y||0)**2+(a.z||0)**2);lp=lp*.8+m*.2;
+        if(lp>prev)rising=true;else if(lp<prev&&rising){rising=false;if(prev>11.2&&Date.now()-last>700){last=Date.now();rep()}}prev=lp};
+      addEventListener('devicemotion',h);stopAuto=()=>removeEventListener('devicemotion',h);b.textContent='Auto-count (beta): on'};
     addEventListener('keydown',kd);$('#rep').onclick=rep;
   }else{
     let left=d.n;
@@ -363,7 +434,7 @@ function done(d){
     const before=lvl(st.xp[k]);
     st.xp[k]=Math.min(MAXXP,st.xp[k]+(k==='f'?15:GAIN));
     if(k!=='f'){st.w[k]={open:n+cool(),dead:n+cool()+grace()};st.bp=0;st.bz=0}else st.fd=n+FGRACE
-    banner('Workout complete');logAdd('w',1);toast('+'+(k==='f'?15:GAIN)+' '+NAME[k]);buzz([100,50,100]);beep(523,.1);setTimeout(()=>beep(784,.18),110);
+    banner('Workout complete');logAdd('w',1);onWorkout(k);toast('+'+(k==='f'?15:GAIN)+' '+NAME[k]);buzz([100,50,100]);beep(523,.1);setTimeout(()=>beep(784,.18),110);
     if(lvl(st.xp[k])>before)setTimeout(()=>{banner(NAME[k]+': '+RANK[lvl(st.xp[k])-1]);beep(880,.3)},2300);
   }
   save();render();rest();
@@ -400,20 +471,23 @@ function riskInfo(){
 function riskBody(r){return r.hit.map(k=>'Your '+NAME[k]+' window closes at '+tfmt(st.w[k].dead)+'.').join(' ')+' Train before then or lose '+DECAY+' XP.'}
 function riskText(r){return (Date.now()>=r.a?'Reminders are silenced until '+tfmt(r.b)+', but your clocks keep running. ':'Quiet hours start at '+tfmt(r.a)+'. ')+riskBody(r)}
 function showWarn(){const el=$('#warn');if(!el)return;const r=riskInfo();if(r){el.textContent=riskText(r);el.hidden=false}else el.hidden=true}
-async function planNative(){
+let planning=false,again=false;
+async function planNative(){if(planning){again=true;return}planning=true;try{await planNow()}finally{planning=false;if(again){again=false;planNative()}}}
+async function planNow(){
   const ln=LN();if(!isNative()||!ln)return;
   try{
     const p=await ln.getPending();if(p.notifications.length)await ln.cancel({notifications:p.notifications});
     if(!st.mins)return;
     const out=[],now=Date.now(),g=grace(),idx={s:0,t:0};let id=1;
+    const base=st.nextAt>now?st.nextAt:now+st.mins*6e4;
     const dl=k=>{let d=st.w[k].dead;while(d<=now)d+=g;return d};
     for(let i=1;i<=58;i++){
-      const t=now+i*st.mins*6e4,d=new Date(t);
+      const t=base+(i-1)*st.mins*6e4,d=new Date(t);
       if(quietAt(d)||t<st.rt.until||t<(st.snooze||0))continue;
       const open=['s','t'].filter(k=>t>=st.w[k].open);if(!open.length)continue;
       open.sort((a,b)=>dl(a)-dl(b));const k=open[0];
       const pool=DRILLS.filter(x=>x.stat===k&&st.on[x.id]);if(!pool.length)continue;
-      const dr=pool[idx[k]++%pool.length];
+      const dr=scaled(pool[idx[k]++%pool.length]);
       out.push({id:id++,title:NAME[k]+' drill',body:dr.name+' \u00b7 '+(dr.type==='reps'?dr.n+' reps':dr.n+' sec'),schedule:{at:d,allowWhileIdle:true},actionTypeId:'DRILL'});
     }
     for(const k of['s','t']){const d=dl(k),t=d-Math.min(30*6e4,g*.25);
@@ -434,16 +508,88 @@ $('#qOn').checked=!!st.qh.on;$('#qFrom').value=st.qh.from;$('#qTo').value=st.qh.
 const qs=()=>{st.qh={on:$('#qOn').checked?1:0,from:+$('#qFrom').value,to:+$('#qTo').value};save();render()};
 ['#qOn','#qFrom','#qTo'].forEach(s=>$(s).onchange=qs);
 $('#rtBtn').onclick=()=>{if(st.rt.wk===wk())return;st.rt={wk:wk(),until:Date.now()+restLen()};save();render();toast('Rest day on: gains protected')};
-let dp=null;
-const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),sa=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
-$('#instTxt').textContent=sa?'You are running it as an installed app.':ios?'In Safari, tap Share, then Add to Home Screen. Open it from your home screen so it runs full screen.':'In Chrome or Edge, open the menu and choose Install app or Add to Home screen.';
-addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#instBtn').hidden=false});
-$('#instBtn').onclick=async()=>{if(!dp)return;dp.prompt();try{await dp.userChoice}catch(e){}dp=null;$('#instBtn').hidden=true};
-function startFocus(){if(busy)return;const pool=DRILLS.filter(d=>d.stat==='f'&&st.on[d.id]);if(!pool.length){toast('Turn on a Focus drill');return}busy=true;$('#hud').innerHTML='';start(pool[Math.floor(Math.random()*pool.length)])}
+function resetWindows(){const n=Date.now();['s','t'].forEach(k=>st.w[k]={open:n,dead:n+cool()+grace()})}
+function devOff(){st.dev=0;st.pace='d';if(st.mins)st.mins=st.prev;resetWindows();save();schedule();render();toast('Test mode off')}
+let tp=0,tt=0;$('#hname').onclick=()=>{const n=Date.now();tp=n-tt>3000?1:tp+1;tt=n;if(tp>=5){tp=0;if(st.dev)devOff();else{st.dev=1;save();render();toast('Test mode on. See Settings.')}}};
+$('#dX').onclick=devOff;
+$('#dF').onclick=()=>{st.pace=st.pace==='q'?'d':'q';resetWindows();save();render()};
+$('#d1').onclick=()=>{st.mins=1;save();schedule();render();toast('Reminders every 1 minute')};
+$('#dN').onclick=async()=>{const ln=LN();if(isNative()&&ln){try{const r=await ln.requestPermissions();if(r.display!=='granted'){toast('Notifications blocked');return}
+  await ln.schedule({notifications:[{id:900,title:'Test reminder',body:'Strength drill: Push-ups \u00b7 12 reps',schedule:{at:new Date(Date.now()+10000),allowWhileIdle:true},actionTypeId:'DRILL'}]});toast('Close the app. It arrives in 10 seconds')}catch(e){toast('Could not schedule')}}else toast('This works in the Android app only')};
+$('#exBtn').onclick=async()=>{const ln=LN();try{const r=await ln.checkExactNotificationSetting();if(r.exact_alarm==='granted')toast('Already allowed');else await ln.changeExactNotificationSetting()}catch(e){toast('Open Settings, Apps, Peak Gains, Alarms and reminders')}};
+const BUILD='28 Nov 2026 03:00';$('#bld').textContent=BUILD;
+$('#dP').onclick=async()=>{const ln=LN();if(!(isNative()&&ln)){$('#pend').textContent='Android app only.';return}
+  try{const p=(await ln.getPending()).notifications||[];const at=x=>new Date((x.schedule&&x.schedule.at)||0);p.sort((a,b)=>at(a)-at(b));
+    $('#pend').innerHTML=p.length?p.length+' queued:<br>'+p.slice(0,10).map(x=>esc(at(x).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'})+' '+(x.title||''))).join('<br>'):'Nothing is queued.'}
+  catch(e){$('#pend').textContent='Could not read the queue.'}};
+function firstRun(){if(busy)return;const h=$('#hud');
+  h.innerHTML='<div class="card"><div class="tag">Welcome</div><div class="big">Turn on reminders</div><div style="color:var(--mute);margin:6px 0 10px">Allow notifications so workout reminders reach you when the app is closed.</div><button class="btn" id="frOk" style="width:100%">Allow notifications</button><button class="chip" id="frNo" style="margin-top:10px">Later</button></div>';
+  $('#frNo').onclick=()=>{h.innerHTML=''};
+  $('#frOk').onclick=async()=>{const ln=LN();h.innerHTML='';
+    try{const r=await ln.requestPermissions();if(r.display!=='granted'){toast('Notifications blocked');return}
+      planNative();toast('Reminders on');
+      try{const x=await ln.checkExactNotificationSetting();if(x.exact_alarm!=='granted'){toast('Now allow exact reminders');setTimeout(()=>ln.changeExactNotificationSetting().catch(()=>{}),1400)}}catch(e){}
+    }catch(e){}}}
+function nameDlg(){
+  if($('#dlg'))return;
+  const o=document.createElement('div');o.className='dlg';o.id='dlg';
+  o.innerHTML='<div class="card" role="dialog" aria-label="Your name"><div class="big">Your name</div><p class="sub" style="margin:6px 0 10px">Shown in the header and on your profile circle.</p><input type="text" id="dlgIn" maxlength="14" placeholder="Enter your name" autocomplete="off"><div class="row" style="margin-top:12px"><button class="btn" id="dlgOk">Save</button><button class="btn alt" id="dlgNo">Cancel</button></div></div>';
+  document.body.appendChild(o);
+  const inp=o.querySelector('#dlgIn');inp.value=st.name||'';setTimeout(()=>inp.focus(),50);
+  const close=()=>o.remove();
+  const ok=()=>{st.name=inp.value.trim().slice(0,14);save();render();close();toast(st.name?'Hi, '+st.name:'Name cleared')};
+  o.querySelector('#dlgOk').onclick=ok;o.querySelector('#dlgNo').onclick=close;
+  o.addEventListener('click',e=>{if(e.target===o)close()});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')ok();if(e.key==='Escape')close()});
+}
+{const av=document.querySelector('.avatar');av.setAttribute('role','button');av.setAttribute('tabindex','0');av.setAttribute('aria-label','Set your name');av.onclick=nameDlg;av.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')nameDlg()}}
+const CHAL=[
+ {id:'s4',name:'Train Strength 4 times',n:4,stat:'s',xp:20,val:w=>w.s},
+ {id:'t4',name:'Train Stamina 4 times',n:4,stat:'t',xp:20,val:w=>w.t},
+ {id:'f3',name:'Do 3 Focus drills',n:3,stat:'f',xp:15,val:w=>w.f},
+ {id:'d5',name:'Work out on 5 different days',n:5,stat:'s',xp:25,val:w=>w.days.length}];
+const ACH=[
+ {id:'first',name:'First rep',desc:'Finish your first workout',ok:()=>st.total>=1},
+ {id:'w10',name:'Ten down',desc:'Finish 10 workouts',ok:()=>st.total>=10},
+ {id:'w50',name:'Fifty club',desc:'Finish 50 workouts',ok:()=>st.total>=50},
+ {id:'str3',name:'3-day streak',desc:'Work out 3 days in a row',ok:()=>(st.best||0)>=3},
+ {id:'str7',name:'Week warrior',desc:'Work out 7 days in a row',ok:()=>(st.best||0)>=7},
+ {id:'lv2',name:'Regular',desc:'Reach level 2 in any stat',ok:()=>['s','t','f'].some(k=>lvl(st.xp[k])>=2)},
+ {id:'lv4',name:'Peak',desc:'Reach level 4 in any stat',ok:()=>['s','t','f'].some(k=>lvl(st.xp[k])>=4)},
+ {id:'all',name:'Well rounded',desc:'Reach level 2 in all three stats',ok:()=>['s','t','f'].every(k=>lvl(st.xp[k])>=2)}];
+function weekState(){const k=wk();if(!st.wkc||st.wkc.k!==k)st.wkc={k,s:0,t:0,f:0,days:[],done:{}};return st.wkc}
+function onWorkout(k){
+  const t=dkey();st.total=(st.total||0)+1;
+  if(st.lastDay!==t){st.streak=(st.lastDay===dkey(-1))?(st.streak||0)+1:1;st.lastDay=t;st.best=Math.max(st.best||0,st.streak)}
+  const w=weekState();w[k]=(w[k]||0)+1;if(!w.days.includes(t))w.days.push(t);
+  CHAL.forEach(c=>{if(!w.done[c.id]&&c.val(w)>=c.n){w.done[c.id]=1;st.xp[c.stat]=Math.min(MAXXP,st.xp[c.stat]+c.xp);setTimeout(()=>{toast('Challenge done: +'+c.xp+' '+NAME[c.stat]);buzz([60,40,60])},1200)}});
+  ACH.forEach(a=>{if(!st.ach[a.id]&&a.ok()){st.ach[a.id]=Date.now();setTimeout(()=>{banner('Badge: '+a.name);beep(988,.25)},3600)}});
+}
+function renderProg(){
+  if(!$('#chal'))return;const w=weekState(),ok=st.lastDay===dkey()||st.lastDay===dkey(-1);
+  $('#strk').textContent=(ok?st.streak||0:0)+' day streak';$('#strkSub').textContent='Best '+(st.best||0)+((st.best||0)===1?' day':' days')+' \u00b7 '+(st.total||0)+' workouts total';
+  $('#chal').innerHTML=CHAL.map(c=>{const v=Math.min(c.val(w),c.n);return '<div class="ch"><div class="stl"><span>'+c.name+'</span><span>'+(w.done[c.id]?'Done':v+'/'+c.n)+'</span></div><div class="track"><i style="width:'+(v/c.n*100)+'%;background:var(--'+c.stat+')"></i></div><small>+'+c.xp+' '+NAME[c.stat]+' XP</small></div>'}).join('');
+  $('#badges').innerHTML=ACH.map(a=>'<div class="bd'+(st.ach[a.id]?' on':'')+'"><b>'+esc(a.name)+'</b><small>'+esc(a.desc)+'</small></div>').join('');
+}
+function tour(){if($('#dlg'))return;const o=document.createElement('div');o.className='dlg';o.id='dlg';let i=0;
+  const S=[['Workout windows','Strength and Stamina each have a workout window. Train inside it to keep your gains.'],['Decay','Miss a window and you lose XP. Focus decays much more slowly.'],['Levels and challenges','Earn XP to reach level 4, finish weekly challenges and collect badges on the Progress tab.']];
+  const draw=()=>{o.innerHTML='<div class="card" role="dialog"><div class="tag">'+(i+1)+' of 3</div><div class="big">'+S[i][0]+'</div><p class="sub" style="margin:8px 0 12px">'+S[i][1]+'</p><button class="btn" id="tN">'+(i<2?'Next':'Got it')+'</button></div>';$('#tN').onclick=()=>{if(i<2){i++;draw()}else o.remove()}};
+  document.body.appendChild(o);draw()}
+$('#tourBtn').onclick=tour;
+let rc=0;$('#rsBtn').onclick=()=>{if(!rc){rc=1;$('#rsBtn').textContent='Tap again to erase progress';setTimeout(()=>{rc=0;$('#rsBtn').textContent='Reset progress'},3500);return}
+  rc=0;st.xp={s:0,t:0,f:0};st.log={};st.ach={};st.total=0;st.streak=0;st.best=0;st.lastDay='';st.wkc=null;st.fd=Date.now()+FGRACE;st.bp=0;st.bz=0;resetWindows();save();render();toast('Progress reset');$('#rsBtn').textContent='Reset progress'};
+if(!st.tour){st.tour=1;persist();setTimeout(tour,700)}
+const THEMES=[{id:'sunset',name:'Sunset',ok:()=>true},{id:'ocean',name:'Ocean',ok:()=>!!st.ach.lv2,hint:'earn the Regular badge'},{id:'ember',name:'Ember',ok:()=>!!st.ach.str7,hint:'earn Week warrior'},{id:'mono',name:'Mono',ok:()=>!!st.ach.lv4,hint:'earn the Peak badge'}];
+let thSig='';
+function renderThemes(){const el=$('#themes');if(!el)return;const cur=st.theme||'sunset';document.documentElement.setAttribute('data-th',cur);
+  const sig=THEMES.map(t=>t.ok()).join()+cur;if(sig===thSig)return;thSig=sig;
+  el.innerHTML=THEMES.map(t=>'<button class="chip" data-th="'+t.id+'" aria-pressed="'+(cur===t.id)+'"'+(t.ok()?'':' disabled')+'>'+t.name+(t.ok()?'':' (locked)')+'</button>').join('');
+  $('#themeHint').textContent=THEMES.filter(t=>!t.ok()).map(t=>t.name+': '+t.hint).join(' \u00b7 ')}
+$('#themes').addEventListener('click',e=>{const id=e.target.dataset&&e.target.dataset.th;const t=THEMES.find(x=>x.id===id);if(t&&t.ok()){st.theme=id;save();render()}});
+function startFocus(){if(busy)return;const pool=DRILLS.filter(d=>d.stat==='f'&&st.on[d.id]);if(!pool.length){toast('Turn on a Focus drill');return}busy=true;$('#hud').innerHTML='';start(scaled(pool[Math.floor(Math.random()*pool.length)]))}
 $('#cdAdd').onclick=()=>{const nm=$('#cdName').value.trim().slice(0,24),n=Math.max(1,Math.min(300,+$('#cdN').value||10));if(!nm){toast('Name your drill');return}
   const d={id:'c'+Date.now(),name:nm,type:$('#cdT').value,n,stat:$('#cdS').value,tip:'Your drill',custom:1};DRILLS.push(d);st.custom.push(d);st.on[d.id]=1;save();renderDrills();$('#cdName').value='';toast('Drill added')};
 $('#drills').addEventListener('click',e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id)return;e.preventDefault();const i=DRILLS.findIndex(x=>x.id===id);if(i>-1)DRILLS.splice(i,1);st.custom=st.custom.filter(x=>x.id!==id);delete st.on[id];save();renderDrills()});
-$('#nameIn').value=st.name||'';$('#nameIn').oninput=e=>{st.name=e.target.value.slice(0,14);save();render()};
 $('#sndOn').checked=!!st.snd;$('#sndOn').onchange=e=>{st.snd=e.target.checked?1:0;save()};
 $('#bkOut').onclick=async()=>{const t=JSON.stringify(st);$('#bk').value=t;try{await navigator.clipboard.writeText(t);toast('Copied')}catch(e){$('#bk').select();toast('Select and copy the text')}};
 $('#bkIn').onclick=()=>{try{const x=JSON.parse($('#bk').value);if(!x||!x.xp||!x.w)throw 0;localStorage.setItem('sgym2',JSON.stringify(x));toast('Imported');setTimeout(()=>location.reload(),600)}catch(e){toast('That does not look like a backup')}};
@@ -452,8 +598,8 @@ $('#mMinus').onclick=()=>setInt(VALS[Math.max(0,VALS.indexOf(st.prev)-1)]);
 $('#mPlus').onclick=()=>setInt(VALS[Math.min(VALS.length-1,VALS.indexOf(st.prev)+1)]);
 $('#mOn').onchange=e=>{st.mins=e.target.checked?st.prev:0;save();schedule();render()};
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===b.dataset.v));scrollTo(0,0);buzz(10)});
-tick();schedule();
-if(isNative()){$('#inst').hidden=true;const ln=LN();if(ln){ln.registerActionTypes({types:[{id:'DRILL',actions:[{id:'start',title:'Start'},{id:'snooze',title:'Snooze 1 h'}]}]}).catch(()=>{});ln.addListener('localNotificationActionPerformed',e=>{if(e.actionId==='snooze'){st.snooze=Date.now()+36e5;save();toast('Snoozed for 1 hour')}else setTimeout(prompt,400)})}document.addEventListener('visibilitychange',()=>{if(!document.hidden)planNative()});planNative()}
+tick();schedule(true);
+if(isNative()){$('#help').hidden=false;if(!st.seen){st.seen=1;persist();setTimeout(firstRun,900)}const ln=LN();if(ln){ln.registerActionTypes({types:[{id:'DRILL',actions:[{id:'start',title:'Start'},{id:'snooze',title:'Snooze 1 h'}]}]}).catch(()=>{});ln.addListener('localNotificationActionPerformed',e=>{if(e.actionId==='snooze'){st.snooze=Date.now()+36e5;save();toast('Snoozed for 1 hour')}else setTimeout(prompt,400)})}document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule(true)});planNative()}
 </script>
 </body>
 </html>

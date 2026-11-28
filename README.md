@@ -1,37 +1,33 @@
-# Peak Window native app (Capacitor)
+# Peak Gains (Android app project)
 
-Wraps the web app as a real iOS and Android app. Reminders are scheduled on the phone itself, so no server is needed.
+Workout reminders with Strength, Stamina and Focus windows. Reminders are scheduled on the phone itself, so no server is needed.
 
-## One-time setup
-1. Install Node.js. For Android install Android Studio. For iOS you need a Mac with Xcode.
-2. Edit `appId` in `capacitor.config.json` to your own reverse-domain id (for example `com.janedoe.streetgym`).
-3. `npm install`
-4. `npm run icons` (makes app icons and splash screens from the `assets` folder)
-5. `npx cap add android` and/or `npx cap add ios`
-6. `npm run sync`
+## Option A: build the APK with GitHub (nothing to install)
+1. Create a free GitHub account and a new **public** repository.
+2. Upload everything inside this folder (not the folder itself) with "uploading an existing file".
+   Files you should see in the repository root: `www`, `assets`, `package.json`, `capacitor.config.json`, `privacy.html`, `README.md`, `.gitignore`.
+3. Hidden folders are often skipped by uploads. If the repository has no `.github` folder, click **Add file > Create new file**,
+   type `.github/workflows/android.yml` as the name, and paste in the contents of that file from this project. Commit it.
+4. Open the **Actions** tab and run **Build Android APK** (it also starts by itself after a commit to `main`).
+5. When it turns green, open the run and download the artifact named **peak-window-debug-apk**. Unzip it to get `app-debug.apk`.
+6. Copy the APK to your phone, open it, and allow installs from that source.
+7. Open the app and tap **Allow notifications** in Settings. Android 13+ will ask for permission.
 
-## Run it
-- Android: `npm run android`, then press Run in Android Studio with your phone plugged in.
-- iOS: `npm run ios`, set your Team under Signing in Xcode, then Run on your iPhone.
+## Option B: build on your own computer
+1. Install Node.js and Android Studio.
+2. `npm install`
+3. `npm run icons`
+4. `npx cap add android`
+5. `npm run sync`
+6. `npm run android`, then press Run with your phone plugged in.
 
-## Android extras
-- Android 13+ asks for notification permission when you tap "Allow notifications".
-- Android 12+ may need exact alarms. If reminders arrive late, add
-  `<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>` to
-  `android/app/src/main/AndroidManifest.xml` and allow "Alarms and reminders" for the app in system settings.
+## Notes
+- Android 12+ may need exact alarms. The GitHub workflow adds the permission for you. If reminders arrive late,
+  allow "Alarms & reminders" for the app in system settings and turn off battery optimisation for it.
+- The app schedules about 58 reminders ahead. Open it every day or two to refresh the schedule.
+- Debug APKs are for personal testing and cannot be uploaded to Google Play.
+- Before publishing, change `appId` in `capacitor.config.json`, host `privacy.html` and add your contact email to it.
 
-## Publishing
-- Apple Developer Program: about $99 per year. Google Play Console: one-time $25.
-- Both stores want a privacy policy URL, screenshots and a content rating.
-
-## How reminders work
-The app schedules your next ~58 prompts plus window-closing alerts on the device, respecting your interval,
-quiet hours, rest day and enabled drills. It reschedules whenever you change something, finish a workout or open the app.
-iPhone allows 64 pending local notifications, so open the app at least once per day or two to refresh the schedule.
-Decay is applied when you next open the app.
-
-## Free automatic Android builds (GitHub Actions)
-1. Put this folder in a GitHub repository (public repos get free build minutes).
-2. Push to the `main` branch, or run "Build Android APK" from the Actions tab.
-3. When it finishes, download `street-gym-debug-apk` from the run page, unzip it and install the APK on your phone
-   (allow installs from unknown sources). Debug APKs are fine for personal use but cannot go on Google Play.
+## If the build says it cannot find ./www
+The workflow now builds the `www` folder itself. Make sure `index.html`, `manifest.json` and `icon.svg` (the files from the `www` folder)
+sit at the top level of the repository next to `package.json`. Icons are optional: without the `assets` folder the app just uses a default icon.
