@@ -28,7 +28,7 @@ jobs:
       - name: Set app name
         run: |
           f=android/app/src/main/res/values/strings.xml
-          sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Gains Through Action</string>#; s#<string name="title_activity_main">[^<]*</string>#<string name="title_activity_main">Gains Through Action</string>#' "$f"
+          sed -i 's#<string name="app_name">[^<]*</string>#<string name="app_name">Peak Gains</string>#; s#<string name="title_activity_main">[^<]*</string>#<string name="title_activity_main">Peak Gains</string>#' "$f"
       - name: Generate icons if provided
         continue-on-error: true
         run: |
